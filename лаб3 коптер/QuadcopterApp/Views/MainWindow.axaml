@@ -1,0 +1,703 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuadcopterApp.ViewModels"
+        x:Class="QuadcopterApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Квадрокоптеры, операторы и механики"
+        Width="1460" Height="880"
+        MinWidth="1100" MinHeight="680"
+        Background="#EEF1F5"
+        WindowStartupLocation="CenterScreen">
+
+  <Window.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="BoxShadow" Value="0 2 8 0 #22000000" />
+    </Style>
+    <Style Selector="Border.tile">
+      <Setter Property="Background" Value="#F3F6FA" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="10,8" />
+    </Style>
+    <Style Selector="Border.chip">
+      <Setter Property="Background" Value="#F3F6FA" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="10,3" />
+      <Setter Property="Margin" Value="6,0,0,0" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="#6B7785" />
+    </Style>
+    <Style Selector="TextBlock.caption.alarm">
+      <Setter Property="Foreground" Value="#C0392B" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.header">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="MinHeight" Value="38" />
+      <Setter Property="Padding" Value="12,4" />
+    </Style>
+    <Style Selector="ListBoxItem">
+      <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style Selector="Canvas.drone.spinning Path.blade">
+      <Style.Animations>
+        <Animation Duration="0:0:0.18" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="RotateTransform.Angle" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="RotateTransform.Angle" Value="360" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Canvas.drone.spinning Ellipse.disc">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Ellipse.led">
+      <Setter Property="Fill" Value="#2ECC71" />
+    </Style>
+    <Style Selector="Ellipse.led.alarm">
+      <Setter Property="Fill" Value="#E74C3C" />
+      <Style.Animations>
+        <Animation Duration="0:0:0.6" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="1" />
+          </KeyFrame>
+          <KeyFrame Cue="50%">
+            <Setter Property="Opacity" Value="0.15" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.sos">
+      <Style.Animations>
+        <Animation Duration="0:0:1" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="ScaleTransform.ScaleX" Value="0.6" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.6" />
+            <Setter Property="Opacity" Value="0.9" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="ScaleTransform.ScaleX" Value="1.2" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1.2" />
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.wave1">
+      <Style.Animations>
+        <Animation Duration="0:0:1.4" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="ScaleTransform.ScaleX" Value="0.3" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.3" />
+            <Setter Property="Opacity" Value="0.9" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="ScaleTransform.ScaleX" Value="2" />
+            <Setter Property="ScaleTransform.ScaleY" Value="2" />
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.wave2">
+      <Style.Animations>
+        <Animation Duration="0:0:1.4" Delay="0:0:0.7" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="ScaleTransform.ScaleX" Value="0.3" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.3" />
+            <Setter Property="Opacity" Value="0.9" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="ScaleTransform.ScaleX" Value="2" />
+            <Setter Property="ScaleTransform.ScaleY" Value="2" />
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.tip">
+      <Setter Property="Fill" Value="#95A5A6" />
+    </Style>
+    <Style Selector="Ellipse.tip.on">
+      <Setter Property="Fill" Value="#2ECC71" />
+    </Style>
+    <Style Selector="Line.link">
+      <Style.Animations>
+        <Animation Duration="0:0:0.5" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="StrokeDashOffset" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="StrokeDashOffset" Value="-8" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Canvas.mechanic.walking Canvas.figure">
+      <Style.Animations>
+        <Animation Duration="0:0:0.36" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="50%">
+            <Setter Property="TranslateTransform.Y" Value="-3" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Canvas.mechanic.repairing Path.wrench">
+      <Style.Animations>
+        <Animation Duration="0:0:0.5" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="RotateTransform.Angle" Value="-35" />
+          </KeyFrame>
+          <KeyFrame Cue="50%">
+            <Setter Property="RotateTransform.Angle" Value="25" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="RotateTransform.Angle" Value="-35" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </Window.Styles>
+
+  <Grid ColumnDefinitions="*,450" Margin="16">
+    <Border Grid.Column="0" Classes="card" Margin="0,0,16,0">
+      <Grid RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,10">
+          <TextBlock Text="Полигон" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" />
+          <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Classes="caption" Margin="0,4,0,0" TextWrapping="Wrap"
+                     Text="Операторы управляют квадрокоптерами с пульта. При сбое GPS квадрокоптер аварийно садится, оператор вызывает механика, после ремонта полёт продолжается." />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Classes="chip">
+              <TextBlock Text="{Binding AirborneCount, StringFormat='В воздухе: {0}'}" />
+            </Border>
+            <Border Classes="chip">
+              <TextBlock Text="{Binding TotalFlights, StringFormat='Вылетов: {0}'}" />
+            </Border>
+            <Border Classes="chip">
+              <TextBlock Text="{Binding TotalGpsFailures, StringFormat='Сбоев GPS: {0}'}" />
+            </Border>
+            <Border Classes="chip">
+              <TextBlock Text="{Binding TotalRepairs, StringFormat='Ремонтов: {0}'}" />
+            </Border>
+            <Border Classes="chip">
+              <TextBlock Text="{Binding PendingRepairs, StringFormat='В очереди: {0}'}" />
+            </Border>
+          </StackPanel>
+        </Grid>
+
+        <Viewbox Grid.Row="1" Stretch="Uniform">
+          <Border Width="900" Height="600" CornerRadius="8" ClipToBounds="True">
+            <Panel>
+              <Rectangle>
+                <Rectangle.Fill>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Offset="0" Color="#BFE0A3" />
+                    <GradientStop Offset="1" Color="#98C77C" />
+                  </LinearGradientBrush>
+                </Rectangle.Fill>
+              </Rectangle>
+              <Path Stroke="#22FFFFFF" StrokeThickness="1"
+                    Data="M50,0 V600 M100,0 V600 M150,0 V600 M200,0 V600 M250,0 V600 M300,0 V600 M350,0 V600 M400,0 V600 M450,0 V600 M500,0 V600 M550,0 V600 M600,0 V600 M650,0 V600 M700,0 V600 M750,0 V600 M800,0 V600 M850,0 V600 M0,50 H900 M0,100 H900 M0,150 H900 M0,200 H900 M0,250 H900 M0,300 H900 M0,350 H900 M0,400 H900 M0,450 H900 M0,500 H900 M0,550 H900" />
+
+              <Canvas>
+                <Rectangle Canvas.Left="70" Canvas.Top="190" Width="760" Height="210"
+                           RadiusX="14" RadiusY="14"
+                           Fill="#14FFFFFF" Stroke="#88FFFFFF" StrokeThickness="2"
+                           StrokeDashArray="4,3" />
+                <TextBlock Canvas.Left="84" Canvas.Top="376" Text="Зона полётов"
+                           FontSize="13" FontWeight="SemiBold" Foreground="#AAFFFFFF" />
+
+                <Border Canvas.Left="14" Canvas.Top="14" Width="232" Height="150"
+                        CornerRadius="8" Background="#EFE6D6" BorderBrush="#A8916B" BorderThickness="2">
+                  <Grid RowDefinitions="Auto,*">
+                    <Border Background="#A8916B" CornerRadius="6,6,0,0" Padding="10,3">
+                      <TextBlock Text="Мастерская" Foreground="White" FontWeight="SemiBold" FontSize="13" />
+                    </Border>
+                    <Path Grid.Row="1" Stroke="#22000000" StrokeThickness="1"
+                          Data="M0,60 H228" />
+                  </Grid>
+                </Border>
+
+                <Rectangle Canvas.Left="8" Canvas.Top="414" Width="884" Height="180"
+                           RadiusX="12" RadiusY="12"
+                           Fill="#55A9B4C2" Stroke="#66FFFFFF" StrokeThickness="1" />
+              </Canvas>
+
+              <ItemsControl ItemsSource="{Binding Quadcopters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                    <Canvas>
+                      <Panel Canvas.Left="{Binding PadLeft}" Canvas.Top="{Binding PadTop}" Width="52" Height="52">
+                        <Ellipse Fill="#5D6D7E" Stroke="{Binding Accent}" StrokeThickness="3" />
+                        <Ellipse Margin="8" Stroke="#40FFFFFF" StrokeThickness="1" />
+                        <TextBlock Text="H" Foreground="White" FontSize="20" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Panel>
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Quadcopters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                    <Canvas>
+                      <Line Classes="link" IsVisible="{Binding HasLink}"
+                            StartPoint="{Binding LinkStart}" EndPoint="{Binding LinkEnd}"
+                            Stroke="{Binding Accent}" StrokeThickness="2" StrokeDashArray="2,2"
+                            Opacity="0.75" />
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Quadcopters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                    <Canvas>
+                      <Canvas Canvas.Left="{Binding OperatorLeft}" Canvas.Top="{Binding OperatorTop}"
+                              Width="60" Height="62">
+                        <Ellipse Classes="wave1" IsVisible="{Binding IsRemoteOn}"
+                                 Canvas.Left="40" Canvas.Top="8" Width="12" Height="12"
+                                 Stroke="{Binding Accent}" StrokeThickness="1.5">
+                          <Ellipse.RenderTransform>
+                            <ScaleTransform />
+                          </Ellipse.RenderTransform>
+                        </Ellipse>
+                        <Ellipse Classes="wave2" IsVisible="{Binding IsRemoteOn}"
+                                 Canvas.Left="40" Canvas.Top="8" Width="12" Height="12"
+                                 Stroke="{Binding Accent}" StrokeThickness="1.5">
+                          <Ellipse.RenderTransform>
+                            <ScaleTransform />
+                          </Ellipse.RenderTransform>
+                        </Ellipse>
+                        <Ellipse Canvas.Left="20" Canvas.Top="42" Width="20" Height="7" Fill="#33000000" />
+                        <Path Stroke="#34495E" StrokeThickness="3" StrokeLineCap="Round"
+                              Data="M27,34 L25,45 M33,34 L35,45" />
+                        <Rectangle Canvas.Left="23" Canvas.Top="19" Width="14" Height="17"
+                                   RadiusX="4" RadiusY="4" Fill="{Binding Accent}" />
+                        <Path Stroke="#F2C9A0" StrokeThickness="2.5" StrokeLineCap="Round"
+                              Data="M25,23 L38,29 M35,23 L41,27" />
+                        <Line StartPoint="45,26" EndPoint="46,15" Stroke="#2C3E50" StrokeThickness="1.5" />
+                        <Ellipse Classes="tip" Classes.on="{Binding IsRemoteOn}"
+                                 Canvas.Left="44" Canvas.Top="12" Width="4" Height="4" />
+                        <Rectangle Canvas.Left="37" Canvas.Top="25" Width="10" Height="7"
+                                   RadiusX="1.5" RadiusY="1.5" Fill="#2C3E50" />
+                        <Ellipse Canvas.Left="24" Canvas.Top="5" Width="12" Height="12"
+                                 Fill="#F2C9A0" Stroke="#B08968" StrokeThickness="1" />
+                        <Path Fill="#5D4037" Data="M24,10 A6,6 0 0 1 36,10 L36,9 A6,5 0 0 0 24,9 Z" />
+                        <TextBlock Canvas.Top="47" Width="60" TextAlignment="Center"
+                                   FontSize="10" FontWeight="SemiBold" Foreground="#263238"
+                                   Text="{Binding OperatorName}" />
+                      </Canvas>
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Quadcopters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                    <Canvas>
+                      <Ellipse Canvas.Left="{Binding ShadowLeft}" Canvas.Top="{Binding ShadowTop}"
+                               Width="{Binding ShadowWidth}" Height="{Binding ShadowHeight}"
+                               Opacity="{Binding ShadowOpacity}" Fill="Black" />
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Mechanics}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:MechanicViewModel">
+                    <Canvas>
+                      <Canvas Classes="mechanic"
+                              Classes.walking="{Binding IsWalking}"
+                              Classes.repairing="{Binding IsRepairing}"
+                              Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}"
+                              Width="80" Height="62">
+                        <Ellipse Canvas.Left="30" Canvas.Top="42" Width="20" Height="7" Fill="#33000000" />
+                        <Canvas Classes="figure" Width="80" Height="48">
+                          <Canvas.RenderTransform>
+                            <TranslateTransform />
+                          </Canvas.RenderTransform>
+                          <Path Stroke="#2C3E50" StrokeThickness="3" StrokeLineCap="Round"
+                                Data="M37,34 L35,45 M43,34 L45,45" />
+                          <Rectangle Canvas.Left="33" Canvas.Top="19" Width="14" Height="17"
+                                     RadiusX="4" RadiusY="4" Fill="#34495E" />
+                          <Rectangle Canvas.Left="36" Canvas.Top="22" Width="8" Height="6"
+                                     RadiusX="1" RadiusY="1" Fill="{Binding Accent}" />
+                          <Path Stroke="#F2C9A0" StrokeThickness="2.5" StrokeLineCap="Round"
+                                Data="M35,23 L32,31 M45,23 L50,28" />
+                          <Path Classes="wrench" Width="16" Height="16"
+                                Canvas.Left="46" Canvas.Top="14"
+                                RenderTransformOrigin="25%,85%"
+                                Stroke="#7F8C8D" StrokeThickness="3" StrokeLineCap="Round"
+                                Data="M4,14 L12,5 M9,2 L15,8">
+                            <Path.RenderTransform>
+                              <RotateTransform />
+                            </Path.RenderTransform>
+                          </Path>
+                          <Ellipse Canvas.Left="34" Canvas.Top="5" Width="12" Height="12"
+                                   Fill="#F2C9A0" Stroke="#B08968" StrokeThickness="1" />
+                          <Path Fill="{Binding Accent}" Stroke="#55000000" StrokeThickness="0.8"
+                                Data="M32.5,11.5 A7.5,7.5 0 0 1 47.5,11.5 L49,12 L31,12 Z" />
+                        </Canvas>
+                        <Border Canvas.Top="47" Width="80" IsVisible="{Binding IsAway}">
+                          <Border HorizontalAlignment="Center" Background="#CCFFFFFF" CornerRadius="3" Padding="3,0">
+                            <TextBlock FontSize="10" FontWeight="SemiBold" Foreground="#263238" Text="{Binding Name}" />
+                          </Border>
+                        </Border>
+                      </Canvas>
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Quadcopters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                    <Canvas>
+                      <Canvas Classes="drone"
+                              Classes.spinning="{Binding IsSpinning}"
+                              Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}"
+                              Width="110" Height="96">
+                        <Ellipse Classes="sos" IsVisible="{Binding IsEmergency}"
+                                 Canvas.Left="10" Canvas.Top="7" Width="90" Height="90"
+                                 Stroke="#E74C3C" StrokeThickness="3">
+                          <Ellipse.RenderTransform>
+                            <ScaleTransform />
+                          </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <Path Stroke="#37474F" StrokeThickness="4" StrokeLineCap="Round"
+                              Data="M31,34 L79,70 M79,34 L31,70" />
+
+                        <Panel Canvas.Left="18" Canvas.Top="21" Width="26" Height="26">
+                          <Ellipse Fill="#30FFFFFF" Stroke="#546E7A" StrokeThickness="1.5" />
+                          <Ellipse Classes="disc" IsVisible="False" Margin="2" Fill="#40B0BEC5" />
+                          <Path Classes="blade" Width="26" Height="26" Stroke="#263238" StrokeThickness="2.5"
+                                StrokeLineCap="Round" Data="M4,13 L22,13">
+                            <Path.RenderTransform>
+                              <RotateTransform />
+                            </Path.RenderTransform>
+                          </Path>
+                          <Ellipse Width="6" Height="6" Fill="#263238" />
+                        </Panel>
+                        <Panel Canvas.Left="66" Canvas.Top="21" Width="26" Height="26">
+                          <Ellipse Fill="#30FFFFFF" Stroke="#546E7A" StrokeThickness="1.5" />
+                          <Ellipse Classes="disc" IsVisible="False" Margin="2" Fill="#40B0BEC5" />
+                          <Path Classes="blade" Width="26" Height="26" Stroke="#263238" StrokeThickness="2.5"
+                                StrokeLineCap="Round" Data="M13,4 L13,22">
+                            <Path.RenderTransform>
+                              <RotateTransform />
+                            </Path.RenderTransform>
+                          </Path>
+                          <Ellipse Width="6" Height="6" Fill="#263238" />
+                        </Panel>
+                        <Panel Canvas.Left="18" Canvas.Top="57" Width="26" Height="26">
+                          <Ellipse Fill="#30FFFFFF" Stroke="#546E7A" StrokeThickness="1.5" />
+                          <Ellipse Classes="disc" IsVisible="False" Margin="2" Fill="#40B0BEC5" />
+                          <Path Classes="blade" Width="26" Height="26" Stroke="#263238" StrokeThickness="2.5"
+                                StrokeLineCap="Round" Data="M13,4 L13,22">
+                            <Path.RenderTransform>
+                              <RotateTransform />
+                            </Path.RenderTransform>
+                          </Path>
+                          <Ellipse Width="6" Height="6" Fill="#263238" />
+                        </Panel>
+                        <Panel Canvas.Left="66" Canvas.Top="57" Width="26" Height="26">
+                          <Ellipse Fill="#30FFFFFF" Stroke="#546E7A" StrokeThickness="1.5" />
+                          <Ellipse Classes="disc" IsVisible="False" Margin="2" Fill="#40B0BEC5" />
+                          <Path Classes="blade" Width="26" Height="26" Stroke="#263238" StrokeThickness="2.5"
+                                StrokeLineCap="Round" Data="M4,13 L22,13">
+                            <Path.RenderTransform>
+                              <RotateTransform />
+                            </Path.RenderTransform>
+                          </Path>
+                          <Ellipse Width="6" Height="6" Fill="#263238" />
+                        </Panel>
+
+                        <Border Canvas.Left="41" Canvas.Top="42" Width="28" Height="20"
+                                CornerRadius="6" Background="{Binding Accent}"
+                                BorderBrush="#263238" BorderThickness="1" />
+                        <Ellipse Classes="led" Classes.alarm="{Binding IsGpsAlarm}"
+                                 Canvas.Left="52" Canvas.Top="45" Width="6" Height="6" />
+                        <Rectangle Canvas.Left="48" Canvas.Top="54" Width="14" Height="4"
+                                   RadiusX="2" RadiusY="2" Fill="#55000000" />
+
+                        <Grid Canvas.Top="1" Width="110">
+                          <Border HorizontalAlignment="Center" Background="#D9FFFFFF" CornerRadius="4" Padding="5,0">
+                            <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="#263238" Text="{Binding Name}" />
+                          </Border>
+                        </Grid>
+
+                        <Border IsVisible="{Binding IsGpsAlarm}"
+                                Canvas.Left="70" Canvas.Top="45" Padding="3,0"
+                                CornerRadius="3" Background="#E74C3C">
+                          <TextBlock Text="GPS!" FontSize="9" FontWeight="Bold" Foreground="White" />
+                        </Border>
+
+                        <Border IsVisible="{Binding IsRepairing}"
+                                Canvas.Left="31" Canvas.Top="87" Width="48" Height="6"
+                                CornerRadius="3" Background="#66000000">
+                          <Rectangle HorizontalAlignment="Left" Width="{Binding RepairBarWidth}"
+                                     RadiusX="3" RadiusY="3" Fill="#F1C40F" />
+                        </Border>
+                      </Canvas>
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Panel>
+          </Border>
+        </Viewbox>
+      </Grid>
+    </Border>
+
+    <Border Grid.Column="1" Classes="card" Padding="12,8,12,12">
+      <TabControl>
+        <TabItem Header="Управление">
+          <ScrollViewer>
+            <StackPanel Spacing="12" Margin="0,8,8,0">
+              <Border Classes="tile">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="header" Text="Параметры полётов" />
+                  <TextBlock Text="{Binding GpsFailurePercent, StringFormat='Вероятность сбоя GPS: {0:0.#} % в секунду'}" />
+                  <Slider Minimum="0" Maximum="20" SmallChange="0.5" LargeChange="2"
+                          Value="{Binding GpsFailurePercent}" />
+                  <TextBlock Text="{Binding FlightSpeed, StringFormat='Скорость полёта: {0:0} ед./с'}" />
+                  <Slider Minimum="40" Maximum="200" SmallChange="5" LargeChange="20"
+                          Value="{Binding FlightSpeed}" />
+                  <Grid ColumnDefinitions="*,8,*" Margin="0,4,0,0">
+                    <Button Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Content="Включить все пульты" Command="{Binding AllRemotesOnCommand}" />
+                    <Button Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Content="Выключить все пульты" Command="{Binding AllRemotesOffCommand}" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="header" VerticalAlignment="Center"
+                             Text="{Binding Quadcopters.Count, StringFormat='Квадрокоптеры ({0})'}" />
+                  <Button Grid.Column="1" Classes="accent" Content="Добавить квадрокоптер"
+                          Command="{Binding AddQuadcopterCommand}" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Quadcopters}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="6" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:QuadcopterViewModel">
+                      <Border Classes="tile">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                          <Ellipse Grid.RowSpan="2" Width="14" Height="14" Margin="0,3,10,0"
+                                   VerticalAlignment="Top" Fill="{Binding Accent}" />
+                          <TextBlock Grid.Column="1" FontWeight="SemiBold">
+                            <Run Text="{Binding Name}" />
+                            <Run Text="·" Foreground="#9AA5B1" />
+                            <Run Text="{Binding OperatorName, StringFormat='оператор {0}'}" FontWeight="Normal" />
+                          </TextBlock>
+                          <TextBlock Grid.Column="2" Classes="caption" Text="{Binding RemoteText}" />
+                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Classes="caption"
+                                     Classes.alarm="{Binding IsGpsAlarm}" Margin="0,2,0,6">
+                            <Run Text="{Binding StateText}" />
+                            <Run Text="·" />
+                            <Run Text="{Binding GpsText}" />
+                          </TextBlock>
+                          <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" ColumnDefinitions="*,8,*">
+                            <Button Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                    Content="{Binding RemoteButtonText}" Command="{Binding ToggleRemoteCommand}" />
+                            <Button Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                    Content="Сбой GPS" Command="{Binding FailGpsCommand}" />
+                          </Grid>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <TextBlock Classes="header" Text="{Binding Mechanics.Count, StringFormat='Механики ({0})'}" />
+                <Border Classes="tile">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="*,8,Auto">
+                      <ComboBox HorizontalAlignment="Stretch"
+                                ItemsSource="{Binding MechanicTypes}"
+                                SelectedItem="{Binding SelectedMechanicType}">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="vm:MechanicTypeOption">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <Ellipse Width="10" Height="10" Fill="{Binding Accent}" VerticalAlignment="Center" />
+                              <TextBlock Text="{Binding Title}" />
+                            </StackPanel>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                      <Button Grid.Column="2" Classes="accent" Content="Нанять"
+                              Command="{Binding HireMechanicCommand}" />
+                    </Grid>
+                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                               Text="{Binding SelectedMechanicType.Description}" />
+                  </StackPanel>
+                </Border>
+                <ItemsControl ItemsSource="{Binding Mechanics}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="6" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:MechanicViewModel">
+                      <Border Classes="tile">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                          <Ellipse Grid.RowSpan="2" Width="14" Height="14" Margin="0,3,10,0"
+                                   VerticalAlignment="Top" Fill="{Binding Accent}" />
+                          <TextBlock Grid.Column="1" FontWeight="SemiBold">
+                            <Run Text="{Binding Specialization}" />
+                            <Run Text="{Binding Name}" />
+                          </TextBlock>
+                          <TextBlock Grid.Column="2" Classes="caption"
+                                     Text="{Binding RepairsCompleted, StringFormat='ремонтов: {0}'}" />
+                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Classes="caption"
+                                     Text="{Binding ActivityText}" />
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="Инспектор">
+          <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="0,8,0,0">
+            <ComboBox HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding Inspectables}"
+                      SelectedItem="{Binding SelectedInspectable}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:InspectableObject">
+                  <TextBlock Text="{Binding Title}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <Border Grid.Row="1" Classes="tile" Margin="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Тип:" FontWeight="SemiBold" />
+                  <Run Text="{Binding InspectedTypeText}" />
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Интерфейсы:" FontWeight="SemiBold" />
+                  <Run Text="{Binding InspectedInterfacesText}" />
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="События:" FontWeight="SemiBold" />
+                  <Run Text="{Binding InspectedEventsText}" />
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Методы:" FontWeight="SemiBold" />
+                  <Run Text="{Binding InspectedMethodsText}" />
+                </TextBlock>
+              </StackPanel>
+            </Border>
+
+            <Grid Grid.Row="2" ColumnDefinitions="175,105,*" Margin="10,12,10,4">
+              <TextBlock Grid.Column="0" Classes="caption" Text="Свойство" />
+              <TextBlock Grid.Column="1" Classes="caption" Text="Тип" />
+              <TextBlock Grid.Column="2" Classes="caption" Text="Значение" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="3">
+              <ItemsControl ItemsSource="{Binding InspectorRows}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <Border BorderBrush="#E3E8EF" BorderThickness="0,0,0,1" Padding="10,5">
+                      <Grid ColumnDefinitions="175,105,*">
+                        <TextBlock Grid.Column="0" FontWeight="SemiBold" Text="{Binding Name}"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="1" Classes="caption" VerticalAlignment="Center"
+                                   Text="{Binding TypeName}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="2" Text="{Binding Value}" TextWrapping="Wrap" />
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </TabItem>
+
+        <TabItem Header="Журнал">
+          <ListBox Margin="0,8,0,0" ItemsSource="{Binding EventLog}" FontSize="13"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </TabItem>
+      </TabControl>
+    </Border>
+  </Grid>
+</Window>

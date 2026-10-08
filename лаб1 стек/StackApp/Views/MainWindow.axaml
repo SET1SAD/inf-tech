@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:StackApp.ViewModels"
+        xmlns:views="using:StackApp.Views"
+        x:Class="StackApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Обобщённый стек LinkedStack&lt;T&gt;"
+        Width="1000" Height="680"
+        MinWidth="820" MinHeight="560"
+        Background="#EEF1F5"
+        WindowStartupLocation="CenterScreen">
+
+  <DockPanel Margin="16">
+    <TextBlock DockPanel.Dock="Top"
+               Text="Демонстрация класса LinkedStack&lt;T&gt;"
+               FontSize="22"
+               FontWeight="SemiBold"
+               Margin="4,0,0,12" />
+
+    <Grid ColumnDefinitions="*,16,*">
+      <views:StackView Grid.Column="0" DataContext="{Binding IntegerStack}" />
+      <views:StackView Grid.Column="2" DataContext="{Binding TextStack}" />
+    </Grid>
+  </DockPanel>
+
+</Window>

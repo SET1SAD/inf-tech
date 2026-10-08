@@ -1,0 +1,146 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StackApp.ViewModels"
+             x:Class="StackApp.Views.StackView"
+             x:DataType="vm:StackViewModelBase">
+
+  <UserControl.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="BoxShadow" Value="0 2 8 0 #22000000" />
+    </Style>
+    <Style Selector="Border.tile">
+      <Setter Property="Background" Value="#F3F6FA" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="10,6" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="#6B7785" />
+    </Style>
+    <Style Selector="TextBlock.value">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.cell">
+      <Setter Property="Background" Value="#DCE7F5" />
+      <Setter Property="BorderBrush" Value="#9DB6D6" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="Border.cell.top">
+      <Setter Property="Background" Value="#2F6FBF" />
+      <Setter Property="BorderBrush" Value="#1F4F8F" />
+    </Style>
+    <Style Selector="Border.cell TextBlock">
+      <Setter Property="Foreground" Value="#1D2B3A" />
+    </Style>
+    <Style Selector="Border.cell.top TextBlock">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ListBoxItem">
+      <Setter Property="Padding" Value="10,5" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="MinWidth" Value="90" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Classes="card">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+      <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,12">
+        <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <Border Background="#E8EEF7" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+          <TextBlock Text="{Binding ElementTypeName, StringFormat='LinkedStack&lt;{0}&gt;'}"
+                     FontFamily="Consolas, Menlo, monospace"
+                     Foreground="#2F6FBF" />
+        </Border>
+      </StackPanel>
+
+      <Grid Grid.Row="1" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,12">
+        <TextBox Grid.Row="0" Grid.Column="0"
+                 Text="{Binding InputText}"
+                 Watermark="Значение для добавления"
+                 Margin="0,0,8,0">
+          <TextBox.KeyBindings>
+            <KeyBinding Gesture="Enter" Command="{Binding PushCommand}" />
+          </TextBox.KeyBindings>
+        </TextBox>
+        <Button Grid.Row="0" Grid.Column="1" Content="Push" Command="{Binding PushCommand}" Classes="accent" />
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+          <Button Content="Pop" Command="{Binding PopCommand}" />
+          <Button Content="Clear" Command="{Binding ClearCommand}" />
+        </StackPanel>
+      </Grid>
+
+      <UniformGrid Grid.Row="2" Columns="3" Margin="0,0,0,12">
+        <Border Classes="tile" Margin="0,0,4,0">
+          <StackPanel>
+            <TextBlock Classes="caption" Text="Count" />
+            <TextBlock Classes="value" Text="{Binding Count}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="tile" Margin="4,0">
+          <StackPanel>
+            <TextBlock Classes="caption" Text="IsEmpty" />
+            <TextBlock Classes="value" Text="{Binding IsEmptyText}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="tile" Margin="4,0,0,0">
+          <StackPanel>
+            <TextBlock Classes="caption" Text="Current" />
+            <TextBlock Classes="value" Text="{Binding CurrentText}" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Border>
+      </UniformGrid>
+
+      <Grid Grid.Row="3" ColumnDefinitions="*,12,*">
+        <DockPanel Grid.Column="0">
+          <TextBlock DockPanel.Dock="Top" Classes="caption" Text="Содержимое (сверху — вершина)" Margin="0,0,0,6" />
+          <Border DockPanel.Dock="Bottom" Height="6" CornerRadius="3" Background="#8A99AB" />
+          <Panel>
+            <TextBlock Text="Стек пуст"
+                       IsVisible="{Binding IsEmpty}"
+                       Classes="caption"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <ItemsControl ItemsSource="{Binding Cells}" Margin="0,0,0,4">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:StackCellViewModel">
+                    <Border Classes="cell" Classes.top="{Binding IsTop}">
+                      <Grid ColumnDefinitions="*,Auto" Margin="10,0">
+                        <TextBlock Grid.Column="0" Text="{Binding Text}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="1" Text="вершина" FontSize="11" VerticalAlignment="Center" IsVisible="{Binding IsTop}" />
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Panel>
+        </DockPanel>
+
+        <DockPanel Grid.Column="2">
+          <TextBlock DockPanel.Dock="Top" Classes="caption" Text="История операций" Margin="0,0,0,6" />
+          <ListBox ItemsSource="{Binding History}" Background="#F7F9FB" CornerRadius="6">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <TextBlock Text="{Binding}" FontFamily="Consolas, Menlo, monospace" FontSize="13" TextWrapping="Wrap" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Grid>
+
+      <TextBlock Grid.Row="4" Text="{Binding Status}" Margin="0,10,0,0" Foreground="#2F4A66" TextWrapping="Wrap" />
+    </Grid>
+  </Border>
+
+</UserControl>

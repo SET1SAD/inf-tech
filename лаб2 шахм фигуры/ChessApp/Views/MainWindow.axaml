@@ -1,0 +1,239 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ChessApp.ViewModels"
+        x:Class="ChessApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Шахматные фигуры: ферзь, ладья, слон"
+        Width="1120" Height="720"
+        MinWidth="900" MinHeight="600"
+        Background="#EEF1F5"
+        WindowStartupLocation="CenterScreen">
+
+  <Window.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="BoxShadow" Value="0 2 8 0 #22000000" />
+    </Style>
+    <Style Selector="Border.tile">
+      <Setter Property="Background" Value="#F3F6FA" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="10,8" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="#6B7785" />
+    </Style>
+    <Style Selector="TextBlock.header">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="TextBlock.coord">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#6B5440" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ListBoxItem">
+      <Setter Property="Padding" Value="10,5" />
+    </Style>
+
+    <Style Selector="Button.square">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              HorizontalContentAlignment="Stretch"
+                              VerticalContentAlignment="Stretch" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.square.light">
+      <Setter Property="Background" Value="#F0D9B5" />
+    </Style>
+    <Style Selector="Button.square.dark">
+      <Setter Property="Background" Value="#B58863" />
+    </Style>
+    <Style Selector="Button.square.light.selected">
+      <Setter Property="Background" Value="#F7EC74" />
+    </Style>
+    <Style Selector="Button.square.dark.selected">
+      <Setter Property="Background" Value="#DAC34B" />
+    </Style>
+    <Style Selector="Button.square Border.hover">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.square:pointerover Border.hover">
+      <Setter Property="Background" Value="#26FFFFFF" />
+    </Style>
+    <Style Selector="TextBlock.glyph">
+      <Setter Property="FontFamily" Value="Segoe UI Symbol, DejaVu Sans, Noto Sans Symbols2" />
+      <Setter Property="FontSize" Value="50" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="#1E1E1E" />
+    </Style>
+    <Style Selector="TextBlock.glyph.white">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Window.Styles>
+
+  <Grid ColumnDefinitions="Auto,16,*" Margin="16">
+
+    <Border Grid.Column="0" Classes="card">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="Доска" Classes="header" />
+        <TextBlock DockPanel.Dock="Bottom"
+                   Text="{Binding Status}"
+                   Foreground="#2F4A66"
+                   TextWrapping="Wrap"
+                   MaxWidth="600"
+                   Margin="0,10,0,0" />
+        <Viewbox Stretch="Uniform" StretchDirection="Both">
+          <Grid ColumnDefinitions="26,560" RowDefinitions="560,26">
+
+            <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding RowLabels}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Columns="1" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" Classes="coord" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border Grid.Row="0" Grid.Column="1" BoxShadow="0 2 10 0 #44000000" ClipToBounds="True">
+              <ItemsControl ItemsSource="{Binding Squares}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="8" Rows="8" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SquareViewModel">
+                    <Button Classes="square"
+                            Classes.light="{Binding IsLight}"
+                            Classes.dark="{Binding IsDark}"
+                            Classes.selected="{Binding IsSelected}"
+                            Command="{Binding ClickCommand}">
+                      <Panel>
+                        <Border Classes="hover" />
+                        <Ellipse Width="20" Height="20"
+                                 Fill="#40000000"
+                                 IsVisible="{Binding IsMoveTarget}" />
+                        <Border BorderBrush="#99B03A2E"
+                                BorderThickness="5"
+                                CornerRadius="35"
+                                Margin="2"
+                                IsVisible="{Binding IsCaptureTarget}" />
+                        <TextBlock Classes="glyph"
+                                   Classes.white="{Binding IsWhitePiece}"
+                                   Text="{Binding FillGlyph}" />
+                        <TextBlock Classes="glyph" Text="{Binding OutlineGlyph}" />
+                      </Panel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Border>
+
+            <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ColumnLabels}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" Classes="coord" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+          </Grid>
+        </Viewbox>
+      </DockPanel>
+    </Border>
+
+    <Border Grid.Column="2" Classes="card">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+        <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,14">
+          <TextBlock Text="Выбранная фигура" Classes="header" />
+          <Border Classes="tile">
+            <StackPanel Spacing="4">
+              <TextBlock Text="{Binding SelectedPieceText}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding SelectedPieceClass}" Classes="caption" TextWrapping="Wrap" IsVisible="{Binding HasSelection}" />
+              <TextBlock Text="{Binding AvailableMovesText}" FontSize="13" TextWrapping="Wrap" IsVisible="{Binding HasSelection}" />
+            </StackPanel>
+          </Border>
+          <Button Content="Убрать выбранную" Command="{Binding RemovePieceCommand}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="6" Margin="0,0,0,14">
+          <TextBlock Text="Новая фигура" Classes="header" />
+          <Grid ColumnDefinitions="*,8,*,8,70,8,Auto">
+            <ComboBox Grid.Column="0"
+                      HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding PieceKinds}"
+                      SelectedItem="{Binding SelectedKind}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:PieceKindOption">
+                  <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Grid.Column="2"
+                      HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding PieceColors}"
+                      SelectedItem="{Binding SelectedColor}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:ColorOption">
+                  <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBox Grid.Column="4" Text="{Binding NewPieceSquare}" Watermark="e4" MaxLength="2">
+              <TextBox.KeyBindings>
+                <KeyBinding Gesture="Enter" Command="{Binding AddPieceCommand}" />
+              </TextBox.KeyBindings>
+            </TextBox>
+            <Button Grid.Column="6" Content="Поставить" Classes="accent" Command="{Binding AddPieceCommand}" />
+          </Grid>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,0,0,14">
+          <Button Content="Начальная расстановка" Command="{Binding ResetBoardCommand}" />
+          <Button Content="Очистить доску" Command="{Binding ClearBoardCommand}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Text="Журнал ходов" Classes="header" />
+
+        <ListBox Grid.Row="4" ItemsSource="{Binding MoveLog}" Background="#F7F9FB" CornerRadius="6">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding}" FontSize="13" TextWrapping="Wrap" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+      </Grid>
+    </Border>
+
+  </Grid>
+
+</Window>
